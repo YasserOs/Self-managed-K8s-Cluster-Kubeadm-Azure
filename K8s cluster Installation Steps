@@ -150,6 +150,8 @@ sudo ufw allow 6443
 Instantiate the ssh tunnel :
 ssh -N -L 6443:localhost:6443 linkdc@40.127.106.16
 
+open a new terminal and start running the kubectl commands
+
 after this you can manage your cluster from your local machine easily using kubectl through ssh tunneling
 
 
