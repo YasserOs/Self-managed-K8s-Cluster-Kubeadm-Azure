@@ -189,45 +189,65 @@ After Povisioning the 3 VMs , ssh into each one of them and run these steps :
       sudo systemctl restart kubelet
       ```
 
-============================================================================
-Step 6. initialize the control plane using kubeadm
-on the master node of choice run this command
+---
+  - Step 7. initialize the control plane using kubeadm
+      
+      Now we are finished with the nodes general configurations and from now we are running these steps on the ***master node*** of choice
 
-sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket=unix:///var/run/cri-dockerd.sock
-(the pod network cidr depends on the networking add on of choice , here its for calico)
+      - SSH into the ***master node*** and follow these steps : 
+      
+        ``` bash
+          sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --cri-socket=unix:///var/run/cri-dockerd.sock
+        ```
+        ``` pod-network-cidr ``` is related to the CNI we chose which is [Calico ](https://projectcalico.docs.tigera.io/getting-started/kubernetes/hardway/configure-ip-pools),
+        and the ``` cri-socket ``` is the cri-dockerd socket we installed before
 
-and after successfull initialization follow the output steps to create kubeconfig file and enable kubectl to communicate with the api-server
+        After running this command the control plane components will be initialized and there will be steps given on the terminal to create the kubeconfig file so kubectl can communicate with the control plane's api server .
 
-6.1 Install pod networking add on (Calico)
-curl https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml -O
+     -  Now remains one step which installing the networking add-on it self (Calico)
+      
+        in the master node :
+        ``` bash
+        curl https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml -O
+        kubectl apply -f calico.yaml
+      ```
+  ---
+  - Step 8. Joining the worker nodes to the cluster
+    run the kubeadm join command  -that's the output from running the kubeadm init command in the master node -on each worker node with the correct cri-socket .
+  ---
+  
+  *The Cluster should be  up and running you can run ``` kubectl get nodes ``` on the master node to verify that the nodes have joined the cluster and everything is working !*
+--- 
 
-kubectl apply -f calico.yaml
+  #### (Optional) Manage the cluster through your local machine using kubectl and ssh-tunneling
+  - copy config file info into local machine file to add the cluster info 
 
-6.2 run the kubeadm join command on each worker node with the correct cri-socket 
+    ``` bash
+    scp user@masternode-ip:~/.kube/config . 
+    ```
+    if you already have kubeconfig file just add the new cluster info into the file and set the context to it donot overwrite the whole file you have.
 
-==================================================================
-Step 7 (Optional) Manage the cluster through your local machine using kubectl and ssh-tunneling
-scp linkdc@40.127.106.16:~/.kube/config .
+      Repoint the api server to : localhost’ s port 6443:
 
-copy config file info into local machine ~/.kube/config file to add the cluster info 
+      ``` bash
+      kubectl config set-context <context-name>
+      kubectl config set clusters.kubernetes.server htps://127.0.0.1:6443 
+      
+      ```
 
-Repoint the api server to : localhost’ s port 6443:
+      Repoint the tls server to the clusterip of the kubernetes service. Otherwise certificate error is generated because the only IPs that are included in the apiserver certificate is the actual apiserver IP and the internal clusterIP of the api service (which is 10.96.0.1)
 
-kubectl config set clusters.kubernetes.server htps://127.0.0.1:6443
+      ``` kubectl config set clusters.kubernetes.tls-server-name 10.96.0.1 ```
 
-Repoint the tls server to the clusterip of the kubernetes service. Otherwise certificate error is generated because the only IPs that are included in the apiserver certificate is the actual apiserver IP and the internal clusterIP of the api service (which is 10.96.0.1)
+      open port 6443 (or any port you want to forward) on local machine ( if not opened )
 
-kubectl config set clusters.kubernetes.tls-server-name 10.96.0.1
+      ``` sudo ufw allow 6443 ```
 
-open port 6443 (or any port you want to forward) on local machine ( if not opened )
+      Instantiate the ssh tunnel :
+      ``` ssh -N -L 6443:localhost:6443 remote-user@masternode-public-ip```
 
-sudo ufw allow 6443
+      open a new terminal and start running the kubectl commands
 
-Instantiate the ssh tunnel :
-ssh -N -L 6443:localhost:6443 linkdc@40.127.106.16
-
-open a new terminal and start running the kubectl commands
-
-after this you can manage your cluster from your local machine easily using kubectl through ssh tunneling
+      **after this you can manage your cluster from your local machine easily using kubectl through ssh tunneling !**
 
 
