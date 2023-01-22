@@ -54,123 +54,141 @@ check the output of the apply before confirming with yes and make sure the requi
 
 ### Part 2 : Installing Kubernetes 
 
+#### Features 
+- 1 Master node
+- 2 Worker nodes
+- CNI : Calico 
+- kubernetes version : latest
+- installation tool : kubeadm
+
 After Povisioning the 3 VMs , ssh into each one of them and run these steps :
 
-Step 1. Turn off the swap & firewall :
+- Step 1. Turn off the swap & firewall :
 
-sudo swapoff -a
+  ``` bash
+    sudo swapoff -a
 
-sudo ufw disable
+    sudo ufw disable
+  ```
 
-==============================================================================
-Step 2. Configure the local IP tables to see the Bridged Traffic
+---
+- Step 2. Configure the local IP tables to see the Bridged Traffic
 
-2.a Enable the bridged traffic
-sudo modprobe br_netfilter
+  - Enable the bridged traffic
+    ``` bash
+      sudo modprobe br_netfilter
+    ```
 
-2.b Copy the below contents in this file.. /etc/modules-load.d/k8s.conf
+  - Copy the below contents in this file.. /etc/modules-load.d/k8s.conf
+    ``` bash
+      cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+      br_netfilter
+      EOF
+    ```
+  - Copy the below contents in this file.. /etc/sysctl.d/k8s.conf
+    ``` bash
+      cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.bridge.bridge-nf-call-iptables = 1
+    EOF
+    ```
 
-cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
-br_netfilter
-EOF
+  - Confirm bridged traffic is enabled on all nodes
+    ``` bash
+      sudo sysctl --system
+    ```
+---
+- Step 3. Install Docker as a Container RUNTIME
 
+  - Add Docker’s official GPG key:
+    ``` bash
 
-2.c Copy the below contents in this file.. /etc/sysctl.d/k8s.conf
+      sudo mkdir -p /etc/apt/keyrings
 
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-EOF
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    ```
 
-2.d confirm bridged traffic is enabled on all nodes
+  - Use the following command to set up the repository:
+    ``` bash
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    ```
+  - Install Docker Engine, containerd, and Docker Compose
+    ``` bash
+      sudo apt-get update
 
-sudo sysctl --system
+      sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    ```
+---
+  - Step 4 Installing A different Container runtime interface
 
-==============================================================================
-Step 3. Install Docker as a Container RUNTIME
+      since dockershim support stopped from kubernetes v1.24+ and we are installing the latest version of k8s ,
+      we need to install a different cri in order for kubelet to communicate with the container runtime in the docker engine (containerd) ,
+      therefore we're installing **cri-dockerd** , a cri from mirantis with the collaboration of docker .
 
-3.1 Add Docker’s official GPG key:
-
-sudo mkdir -p /etc/apt/keyrings
-
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-
-3.2 Use the following command to set up the repository:
-
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  
-3.3 Install Docker Engine, containerd, and Docker Compose
-
-sudo apt-get update
-
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
-
-==============================================================================
-Step 4. Configure Docker Daemon for cgroups management & Start Docker
-
-4.a Copy the below contents in this file.. /etc/docker/daemon.json
-
-cat <<EOF | sudo tee /etc/docker/daemon.json
-{
-  "exec-opts": ["native.cgroupdriver=systemd"],
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "100m"
-  },
-  "storage-driver": "overlay2"
-}
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl restart docker
-sudo systemctl enable docker
-sudo systemctl status docker
-
-==============================================================================
-Step 5. Install kubeadm, kubectl, kubelet
-
-5.1 Add Kubernetes Signing Key
-
-Since you are downloading Kubernetes from a non-standard repository, it is essential to ensure that the software is authentic. This is done by adding a signing key.
-
-On each node, use the curl command to download the key, then store it in a safe place (default is /usr/share/keyrings):
-
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/kubernetes.gpg
-
-5.2 Add Software Repositories 
-Kubernetes is not included in the default repositories. To add the Kubernetes repository to your list, enter the following on each node:
-
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/kubernetes.gpg] http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list
-
-5.3 Kubernetes Installation Tools
-
-sudo apt update
-
-sudo apt install kubeadm kubelet kubectl
+      Just follow the steps to install cri-dockerd from this link
 
 
-## 5.4 Disable AppArmor if problems occur
-## sudo systemctl disable apparmor
+        https://github.com/Mirantis/cri-dockerd
+---
+  - Step 5. Configure Docker Daemon for cgroups management & Start Docker
 
-5.4 Configure kubelet cgroup driver as the container runtime driver
+    - Copy the below contents in this file.. /etc/docker/daemon.json
+      ``` bash
+        cat <<EOF | sudo tee /etc/docker/daemon.json
+        {
+          "exec-opts": ["native.cgroupdriver=systemd"],
+          "log-driver": "json-file",
+          "log-opts": {
+            "max-size": "100m"
+          },
+          "storage-driver": "overlay2"
+        }
+        EOF
+      ```
+      ``` bash
+        sudo systemctl daemon-reload
+        sudo systemctl restart docker
+        sudo systemctl enable docker
+        sudo systemctl status docker
+      ```
+---
+  - Step 6. Install kubeadm, kubectl, kubelet
 
-update kubelet args (KUBELET_KUBECONFIG_ARGS) in /etc/systemd/system/kubelet.service.d/10-kubeadm.conf and add a --cgroup-driver flag
+    - Add Kubernetes Signing Key
 
-it should look like this :
+      Since you are downloading Kubernetes from a non-standard repository, it is essential to ensure that the software is authentic. This is done by adding a signing key.
 
-Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --cgroup-driver=systemd"
+      On each node, use the curl command to download the key, then store it in a safe place (default is /usr/share/keyrings):
+      ``` bash
+      curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/kubernetes.gpg
+      ```
+    - Add Software Repositories 
+      Kubernetes is not included in the default repositories. To add the Kubernetes repository to your list, enter the following on each node:
+      ``` bash
+      echo "deb [arch=amd64 signed-by=/usr/share/keyrings/kubernetes.gpg] http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list
+      ```
+      ``` bash
+      sudo apt update
 
-sudo systemctl daemon-reload
-sudo systemctl restart kubelet
+      sudo apt install kubeadm kubelet kubectl
+      ```
 
-============================================================================
-Installing CRI from mirantis through this link 
-https://github.com/Mirantis/cri-dockerd
+    - Configure kubelet cgroup driver as the container runtime driver
 
-follow steps to install cri-dockerd
+      update kubelet args (KUBELET_KUBECONFIG_ARGS) in /etc/systemd/system/kubelet.service.d/10-kubeadm.conf and add a --cgroup-driver flag
+
+      it should look like this :
+      ``` bash
+      Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --cgroup-driver=systemd"
+      ```
+
+      ``` bash
+      sudo systemctl daemon-reload
+      sudo systemctl restart kubelet
+      ```
+
 ============================================================================
 Step 6. initialize the control plane using kubeadm
 on the master node of choice run this command
