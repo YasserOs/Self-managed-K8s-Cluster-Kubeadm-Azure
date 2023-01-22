@@ -130,7 +130,26 @@ kubectl apply -f calico.yaml
 6.2 run the kubeadm join command on each worker node with the correct cri-socket 
 
 ==================================================================
+Step 7 (Optional) Manage the cluster through your local machine using kubectl and ssh-tunneling
+scp linkdc@40.127.106.16:~/.kube/config .
 
+copy config file info into local machine ~/.kube/config file to add the cluster info 
 
+Repoint the api server to : localhost’ s port 6443:
+
+kubectl config set clusters.kubernetes.server htps://127.0.0.1:6443
+
+Repoint the tls server to the clusterip of the kubernetes service. Otherwise certificate error is generated because the only IPs that are included in the apiserver certificate is the actual apiserver IP and the internal clusterIP of the api service (which is 10.96.0.1)
+
+kubectl config set clusters.kubernetes.tls-server-name 10.96.0.1
+
+open port 6443 (or any port you want to forward) on local machine ( if not opened )
+
+sudo ufw allow 6443
+
+Instantiate the ssh tunnel :
+ssh -N -L 6443:localhost:6443 linkdc@40.127.106.16
+
+after this you can manage your cluster from your local machine easily using kubectl through ssh tunneling
 
 
