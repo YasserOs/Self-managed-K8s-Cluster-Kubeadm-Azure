@@ -81,16 +81,16 @@ After Povisioning the 3 VMs , ssh into each one of them and run these steps :
 
   - Copy the below contents in this file.. /etc/modules-load.d/k8s.conf
     ``` bash
-      cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
-      br_netfilter
-      EOF
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
     ```
   - Copy the below contents in this file.. /etc/sysctl.d/k8s.conf
     ``` bash
-      cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-      net.bridge.bridge-nf-call-ip6tables = 1
-      net.bridge.bridge-nf-call-iptables = 1
-    EOF
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
     ```
 
   - Confirm bridged traffic is enabled on all nodes
