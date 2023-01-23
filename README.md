@@ -77,6 +77,7 @@ After Povisioning the 3 VMs , ssh into each one of them and run these steps :
   - Enable the bridged traffic
     ``` bash
       sudo modprobe br_netfilter
+      sudo modprobe overlay
     ```
 
   - Copy the below contents in this file.. /etc/modules-load.d/k8s.conf
@@ -90,6 +91,7 @@ After Povisioning the 3 VMs , ssh into each one of them and run these steps :
       cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
       net.bridge.bridge-nf-call-ip6tables = 1
       net.bridge.bridge-nf-call-iptables = 1
+      net.ipv4.ip_forward = 1
       EOF
     ```
 
