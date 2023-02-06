@@ -16,9 +16,13 @@ variable "vm_size" {
 variable "vm_admin" {
   type = string
 }
-variable "vm_password" {
+
+variable "pubkey" {
   type = string
 }
+# variable "vm_password" {
+#   type = string
+# }
 variable "os_version" {
   type = string
 }
@@ -33,6 +37,7 @@ variable "nic_subnet_id" {
 
 variable "nic_public_ip" {
   type = string
+  default = ""
 }
 
 variable "nsg_id" {

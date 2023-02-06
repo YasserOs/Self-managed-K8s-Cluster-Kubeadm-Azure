@@ -1,5 +1,5 @@
 resource "azurerm_network_interface" "nic" {
-  name                = "${var.vm_name}_nic"
+  name                = "${var.vm_name}_nic_rke"
   location            = var.location
   resource_group_name = var.resourceGrp
 
@@ -20,8 +20,13 @@ resource "azurerm_linux_virtual_machine" "example" {
   location            = var.location
   size                = var.vm_size
   admin_username      = var.vm_admin
-  admin_password      = var.vm_password
-  disable_password_authentication = "false"
+  # admin_password      = var.vm_password
+  # disable_password_authentication = "false"
+  admin_ssh_key {
+    username   = "adminuser"
+    public_key = var.pubkey
+  }
+
   network_interface_ids = [
     azurerm_network_interface.nic.id,
   ]
@@ -33,8 +38,8 @@ resource "azurerm_linux_virtual_machine" "example" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "${var.os_version}-LTS"
+    offer     = "0001-com-ubuntu-server-focal"
+    sku       = "${var.os_version}"
     version   = "latest"
   }
 }

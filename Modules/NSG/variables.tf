@@ -23,6 +23,6 @@ variable "rule_access" {
   type = string
 }
 
-variable "rule_dest_port" {
-  type = string
+variable "rule_dest_ports" {
+  type = list
 }

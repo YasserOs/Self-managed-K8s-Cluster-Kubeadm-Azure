@@ -1,0 +1,13 @@
+nodes:
+  - address: 192.168.0.4
+    user: adminuser
+    role: [controlplane, worker, etcd]
+  - address: 192.168.0.5
+    user: adminuser
+    role: [controlplane, worker, etcd]
+  - address: 192.168.0.6
+    user: adminuser
+    role: [controlplane, worker, etcd]
+ssh_key_path: ./linux.pem
+enable_cri_dockerd: true
+cluster_name: rke_cluster

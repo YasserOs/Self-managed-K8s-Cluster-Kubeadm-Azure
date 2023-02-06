@@ -51,8 +51,8 @@ variable "rule_access" {
   type = string
 }
 
-variable "rule_dest_port" {
-  type = string
+variable "rule_dest_ports" {
+  type = list
 }
 
 ///// VM variables ////
@@ -75,9 +75,9 @@ variable "os_disk_type" {
 variable "vm_admin" {
   type = string
 }
-variable "vm_password" {
-  type = string
-}
+# variable "vm_password" {
+#   type = string
+# }
 
 
 

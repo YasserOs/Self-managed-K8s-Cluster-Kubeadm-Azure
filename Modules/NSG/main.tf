@@ -9,7 +9,7 @@ resource "azurerm_network_security_group" "example" {
     direction                  = var.rule_direction
     access                     = var.rule_access
     protocol                   = var.rule_protocol
-    destination_port_range     = var.rule_dest_port
+    destination_port_ranges     = var.rule_dest_ports
     source_address_prefix      = "*"
     source_port_range = "*"
     destination_address_prefix = "*"
