@@ -1,0 +1,249 @@
+administrative: false
+apiVersion: management.cattle.io/v3
+builtin: false
+clusterCreatorDefault: false
+context: project
+displayName: Custom Project OwneR
+external: false
+hidden: false
+kind: RoleTemplate
+locked: false
+metadata:
+  annotations:
+    cleanup.cattle.io/rtUpgradeCluster: 'true'
+    field.cattle.io/creatorId: user-wqp8r
+    lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: 'true'
+  creationTimestamp: '2023-02-14T10:58:22Z'
+  finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+  generateName: rt-
+  generation: 3
+  labels:
+    cattle.io/creator: norman
+  managedFields:
+    - apiVersion: management.cattle.io/v3
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            f:lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: {}
+          f:finalizers:
+            .: {}
+            v:"controller.cattle.io/mgmt-auth-roletemplate-lifecycle": {}
+      manager: rancher
+      operation: Update
+      time: '2023-02-14T10:58:22Z'
+    - apiVersion: management.cattle.io/v3
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:administrative: {}
+        f:builtin: {}
+        f:clusterCreatorDefault: {}
+        f:context: {}
+        f:description: {}
+        f:displayName: {}
+        f:external: {}
+        f:hidden: {}
+        f:locked: {}
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:cleanup.cattle.io/rtUpgradeCluster: {}
+            f:field.cattle.io/creatorId: {}
+          f:generateName: {}
+          f:labels:
+            .: {}
+            f:cattle.io/creator: {}
+        f:projectCreatorDefault: {}
+        f:roleTemplateNames: {}
+        f:rules: {}
+      manager: Go-http-client
+      operation: Update
+      time: '2023-02-14T11:31:42Z'
+  name: rt-kfzx7
+  resourceVersion: '838626'
+  uid: 78f0af2b-2fe0-49ec-95f4-323b44944050
+projectCreatorDefault: false
+roleTemplateNames:
+  - clustercatalogs-view
+  - configmaps-manage
+  - create-ns
+  - ingress-manage
+  - navlinks-manage
+  - persistentvolumeclaims-manage
+  - projectcatalogs-manage
+  - projectroletemplatebindings-manage
+  - secrets-manage
+  - serviceaccounts-manage
+  - services-manage
+  - storage-manage
+  - workloads-manage
+rules: 
+   - apiGroups:
+      - management.cattle.io
+     resources:
+      - projectroletemplatebindings
+     verbs:
+      - '*'
+   - apiGroups:
+      - project.cattle.io
+     resources:
+      - apps
+     verbs:
+      - '*'
+   - apiGroups:
+      - project.cattle.io
+     resources:
+      - apprevisions
+     verbs:
+      - '*'
+   - apiGroups:
+      - project.cattle.io
+     resources:
+      - sourcecodeproviderconfigs
+     verbs:
+      - '*'
+   - apiGroups:
+      - management.cattle.io
+     resources:
+      - notifiers
+     verbs:
+      - get
+      - list
+      - watch
+   - apiGroups:
+      - management.cattle.io
+     resources:
+      - projectalertrules
+     verbs:
+      - '*'
+   - apiGroups:
+      - management.cattle.io
+     resources:
+      - projectalertgroups
+     verbs:
+      - '*'
+   - apiGroups:
+      - management.cattle.io
+     resources:
+      - projectloggings
+     verbs:
+      - '*'
+   - apiGroups:
+      - management.cattle.io
+     resources:
+      - projectmonitorgraphs
+     verbs:
+      - '*'
+   - apiGroups:
+      - management.cattle.io
+     resources:
+      - catalogtemplates
+     verbs:
+      - '*'
+   - apiGroups:
+      - management.cattle.io
+     resources:
+      - catalogtemplateversions
+     verbs:
+      - '*'
+   - apiGroups:
+      - monitoring.cattle.io
+     resources:
+      - prometheus
+     verbs:
+      - view
+   - apiGroups:
+      - monitoring.coreos.com
+     resources:
+      - prometheuses
+      - prometheusrules
+      - servicemonitors
+     verbs:
+      - '*'
+   - apiGroups:
+      - apiextensions.k8s.io
+     resources:
+      - customresourcedefinitions
+     verbs:
+      - '*'
+   - apiGroups:
+      - networking.istio.io
+     resources:
+      - destinationrules
+      - envoyfilters
+      - gateways
+      - serviceentries
+      - sidecars
+      - virtualservices
+     verbs:
+      - '*'
+   - apiGroups:
+      - config.istio.io
+     resources:
+      - apikeys
+      - authorizations
+      - checknothings
+      - circonuses
+      - deniers
+      - fluentds
+      - handlers
+      - kubernetesenvs
+      - kuberneteses
+      - listcheckers
+      - listentries
+      - logentries
+      - memquotas
+      - metrics
+      - opas
+      - prometheuses
+      - quotas
+      - quotaspecbindings
+      - quotaspecs
+      - rbacs
+      - reportnothings
+      - rules
+      - solarwindses
+      - stackdrivers
+      - statsds
+      - stdios
+     verbs:
+      - '*'
+   - apiGroups:
+      - authentication.istio.io
+     resources:
+      - policies
+     verbs:
+      - '*'
+   - apiGroups:
+      - rbac.istio.io
+     resources:
+      - rbacconfigs
+      - serviceroles
+      - servicerolebindings
+     verbs:
+      - '*'
+   - apiGroups:
+      - security.istio.io
+     resources:
+      - authorizationpolicies
+     verbs:
+      - '*'
+   - apiGroups:
+      - catalog.cattle.io
+     resources:
+      - operations
+     verbs:
+      - '*'
+   - apiGroups:
+      - catalog.cattle.io
+     resources:
+      - releases
+     verbs:
+      - '*'
+   - apiGroups:
+      - catalog.cattle.io
+     resources:
+      - apps
+     verbs:
+      - '*'

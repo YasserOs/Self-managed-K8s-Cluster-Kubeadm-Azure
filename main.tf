@@ -29,7 +29,7 @@ module "ssh_NSG" {
   rule_dest_ports = var.rule_dest_ports
 }
 
-module "Public_ip"{
+module "Bastion_Public_ip"{
     source = "./Modules/PublicIP"
     name = "Mgmt_pub_ip"
     location = var.region
@@ -62,7 +62,7 @@ module "Prv_VMs"{
     depends_on = [
       module.default_NSG
     ]
-    count = 3
+    count = 6
     location = var.region
     resourceGrp = var.resourceGrp
     vm_name = "${var.vm_name}${count.index+1}-rke"
@@ -75,16 +75,16 @@ module "Prv_VMs"{
     nic_subnet_id = "${module.V-net.default_subnet_id}"
 }
 
-module "Mgmt_VM"{
+module "Bastion"{
     source = "./Modules/Vms"
     depends_on = [
-      module.Public_ip,
+      module.Bastion_Public_ip,
       module.ssh_NSG,
       tls_private_key.linux_pv_key
     ]
     location = var.region
     resourceGrp = var.resourceGrp
-    vm_name = "${var.vm_name}-Mgmt-rke"
+    vm_name = "${var.vm_name}-Bastion"
     vm_admin = var.vm_admin
     vm_size = var.vm_size
     pubkey = tls_private_key.linux_pv_key.public_key_openssh
@@ -92,5 +92,77 @@ module "Mgmt_VM"{
     os_version = var.os_version
     nsg_id = "${module.ssh_NSG.nsg_id}"
     nic_subnet_id = "${module.V-net.default_subnet_id}"
-    nic_public_ip = "${module.Public_ip.ip}"
+    nic_public_ip = "${module.Bastion_Public_ip.ip}"
 }
+
+module "Proxy_Public_ip"{
+    source = "./Modules/PublicIP"
+    name = "Proxy_pub_ip"
+    location = var.region
+    resourceGrp = var.resourceGrp
+}
+module "Proxy_VM"{
+    source = "./Modules/Vms"
+    depends_on = [
+      module.Proxy_Public_ip,
+      module.default_NSG,
+      tls_private_key.linux_pv_key
+    ]
+
+    location = var.region
+    resourceGrp = var.resourceGrp
+    vm_name = "proxy"
+    vm_admin = var.vm_admin
+    vm_size = var.vm_size
+    pubkey = tls_private_key.linux_pv_key.public_key_openssh
+    os_disk_type = var.os_disk_type
+    os_version = var.os_version
+    nsg_id = "${module.default_NSG.nsg_id}"
+    nic_subnet_id = "${module.V-net.default_subnet_id}"
+    nic_public_ip = "${module.Proxy_Public_ip.ip}"
+}
+
+
+
+# module "Public_ip_win"{
+#     source = "./Modules/PublicIP"
+#     name = "Windows_pub_ip"
+#     location = var.region
+#     resourceGrp = var.resourceGrp
+# }
+# resource "azurerm_network_interface" "example" {
+#   name                = "example-nic"
+#   location            = var.region
+#   resource_group_name = var.resourceGrp
+
+#   ip_configuration {
+#     name                          = "internal"
+#     subnet_id                     = "${module.V-net.default_subnet_id}"
+#     private_ip_address_allocation = "Dynamic"
+#     public_ip_address_id = "${module.Public_ip_win.ip}"
+#   }
+# }
+
+# resource "azurerm_windows_virtual_machine" "example" {
+#   name                = "windows-machine"
+#   resource_group_name = var.resourceGrp
+#   location            = var.region
+#   size                = "Standard_F2"
+#   admin_username      = "adminuser"
+#   admin_password      = "P@$$w0rd1234!"
+#   network_interface_ids = [
+#     azurerm_network_interface.example.id,
+#   ]
+
+#   os_disk {
+#     caching              = "ReadWrite"
+#     storage_account_type = "Standard_LRS"
+#   }
+
+#   source_image_reference {
+#     publisher = "MicrosoftWindowsServer"
+#     offer     = "WindowsServer"
+#     sku       = "2016-Datacenter"
+#     version   = "latest"
+#   }
+# }

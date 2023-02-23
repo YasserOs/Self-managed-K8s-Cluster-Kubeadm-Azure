@@ -1,0 +1,286 @@
+apiVersion: management.cattle.io/v3
+builtin: true
+context: project
+description: ''
+displayName: Custom Project Owner
+external: false
+hidden: false
+kind: RoleTemplate
+metadata:
+  annotations:
+    authz.management.cattle.io/bootstrapped-role: 'true'
+    cleanup.cattle.io/rtUpgradeCluster: 'true'
+    lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: 'true'
+  creationTimestamp: '2023-02-09T10:50:59Z'
+  finalizers:
+    - controller.cattle.io/mgmt-auth-roletemplate-lifecycle
+  generation: 2
+  labels:
+    authz.management.cattle.io/bootstrapping: default-roletemplate
+    cattle.io/creator: norman
+  managedFields:
+    - apiVersion: management.cattle.io/v3
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:builtin: {}
+        f:context: {}
+        f:description: {}
+        f:displayName: {}
+        f:external: {}
+        f:hidden: {}
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:authz.management.cattle.io/bootstrapped-role: {}
+            f:cleanup.cattle.io/rtUpgradeCluster: {}
+            f:lifecycle.cattle.io/create.mgmt-auth-roletemplate-lifecycle: {}
+          f:finalizers:
+            .: {}
+            v:"controller.cattle.io/mgmt-auth-roletemplate-lifecycle": {}
+          f:labels:
+            .: {}
+            f:authz.management.cattle.io/bootstrapping: {}
+            f:cattle.io/creator: {}
+        f:projectCreatorDefault: {}
+        f:roleTemplateNames: {}
+        f:rules: {}
+      manager: rancher
+      operation: Update
+      time: '2023-02-09T10:51:14Z'
+  name: custom-project-owner
+  resourceVersion: '19106'
+  uid: e4fc2be9-6f37-4366-a7f9-f479510fd855
+projectCreatorDefault: true
+rules:
+  - apiGroups:
+      - ui.cattle.io
+    resources:
+      - navlinks
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - projectroletemplatebindings
+    verbs:
+      - '*'
+  - apiGroups:
+      - project.cattle.io
+    resources:
+      - apps
+    verbs:
+      - '*'
+  - apiGroups:
+      - project.cattle.io
+    resources:
+      - apprevisions
+    verbs:
+      - '*'
+  - apiGroups:
+      - project.cattle.io
+    resources:
+      - sourcecodeproviderconfigs
+    verbs:
+      - '*'
+  - apiGroups:
+      - ''
+    resources:
+      - namespaces
+    verbs:
+      - create
+  - apiGroups:
+      - ''
+    resources:
+      - persistentvolumes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apiregistration.k8s.io
+    resources:
+      - apiservices
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ''
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - '*'
+  - apiGroups:
+      - metrics.k8s.io
+    resources:
+      - pods
+    verbs:
+      - '*'
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - notifiers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - projectalertrules
+    verbs:
+      - '*'
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - projectalertgroups
+    verbs:
+      - '*'
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - projectloggings
+    verbs:
+      - '*'
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - projectcatalogs
+    verbs:
+      - '*'
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - projectmonitorgraphs
+    verbs:
+      - '*'
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - catalogtemplates
+    verbs:
+      - '*'
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - catalogtemplateversions
+    verbs:
+      - '*'
+  - apiGroups:
+      - monitoring.cattle.io
+    resources:
+      - prometheus
+    verbs:
+      - view
+  - apiGroups:
+      - monitoring.coreos.com
+    resources:
+      - prometheuses
+      - prometheusrules
+      - servicemonitors
+    verbs:
+      - '*'
+  - apiGroups:
+      - networking.istio.io
+    resources:
+      - destinationrules
+      - envoyfilters
+      - gateways
+      - serviceentries
+      - sidecars
+      - virtualservices
+    verbs:
+      - '*'
+  - apiGroups:
+      - config.istio.io
+    resources:
+      - apikeys
+      - authorizations
+      - checknothings
+      - circonuses
+      - deniers
+      - fluentds
+      - handlers
+      - kubernetesenvs
+      - kuberneteses
+      - listcheckers
+      - listentries
+      - logentries
+      - memquotas
+      - metrics
+      - opas
+      - prometheuses
+      - quotas
+      - quotaspecbindings
+      - quotaspecs
+      - rbacs
+      - reportnothings
+      - rules
+      - solarwindses
+      - stackdrivers
+      - statsds
+      - stdios
+    verbs:
+      - '*'
+  - apiGroups:
+      - authentication.istio.io
+    resources:
+      - policies
+    verbs:
+      - '*'
+  - apiGroups:
+      - rbac.istio.io
+    resources:
+      - rbacconfigs
+      - serviceroles
+      - servicerolebindings
+    verbs:
+      - '*'
+  - apiGroups:
+      - security.istio.io
+    resources:
+      - authorizationpolicies
+    verbs:
+      - '*'
+  #### Project Owner permissions
+  - apiGroups:
+      - management.cattle.io
+    resources:
+      - projects
+    verbs:
+      - own
+  - apiGroups:
+      - catalog.cattle.io
+    resources:
+      - operations
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - catalog.cattle.io
+    resources:
+      - releases
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - catalog.cattle.io
+    resources:
+      - apps
+    verbs:
+      - get
+      - list
+      - watch
+
